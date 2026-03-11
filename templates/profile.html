@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>My Profile</title>
+</head>
+<body>
+    <nav class="left"><button onclick="window.location.href='/edit_profile'">Edit Profile</button></nav>
+    <main>
+    <img class="banner" src="{{ profile.banner }}" alt="Banner" />
+    <div class="profile">
+        {% if profile.avatar %}
+        <img class="avatar" src="{{ profile.avatar }}" alt="Avatar" />
+        {% endif %}
+        <div class="profile-info">
+        <h1 class="displayname">{{ profile.display_name or 'No Display Name' }}</h1>
+        <p class="handle">{{ profile.handle }}</p>
+        <p class="bio">{{ profile.description or 'No description' }}</p>
+        <p class="did">{{ profile.did }}</p>
+        </div>
+    </div>
+    <div class="posts">
+        {% for post in posts %}
+        {% include 'post_item.html' %}
+        {% endfor %}
+    </div>
+    </main>
+</body>
+</html>

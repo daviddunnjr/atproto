@@ -1,0 +1,48 @@
+<div class="post">
+    <img class="avatar" src="{{ post.post.author.avatar }}" alt="Avatar" />
+    <div class="text">
+    <h3>{{ post.post.author.display_name or post.post.author.handle }}</h3>
+    <p>{{ post.post.record.text }}</p>
+    <p class="timestamp">{{ post.post.record.created_at }}</p>
+    {% if post.post.record.embed %}
+    <div class="embed">
+        {% if post.has_images %}
+        <div class="images">
+            {% for image in post.post.record.embed.images %}
+            <img src="{{ image.thumb }}" alt="{{ image.alt }}" style="max-width: 200px;">
+            {% endfor %}
+        </div>
+        {% elif post.has_external %}
+        <div class="external">
+            <a href="{{ post.post.record.embed.external.uri }}">{{ post.post.record.embed.external.title }}</a>
+            <p>{{ post.post.record.embed.external.description }}</p>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% if post.has_quote and post.quoted_post %}
+    <div class="quote">
+        <div class="quoted-post">
+            <p><strong>{{ post.quoted_post.author }}</strong></p>
+            <p>{{ post.quoted_post.text }}</p>
+            <p class="timestamp">{{ post.quoted_post.created_at }}</p>
+        </div>
+    </div>
+    {% endif %}
+    <div class="stats">
+        <span>Replies: {{ post.post.reply_count or 0 }}</span>
+        <span>Reposts: {{ post.post.repost_count or 0 }}</span>
+        <span>Likes: {{ post.post.like_count or 0 }}</span>
+    </div>
+    {% if post.repost_author %}
+    <div class="reason">
+        Reposted by {{ post.repost_author }}
+    </div>
+    {% endif %}
+    {% if post.reply_author %}
+    <div class="reply-to">
+        Replying to {{ post.reply_author }}
+    </div>
+    {% endif %}
+    </div>
+</div>
