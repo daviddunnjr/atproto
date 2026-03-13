@@ -6,6 +6,10 @@ def get_client():
     client.login(Login().Username(), Login().Password())
     return client
 
+def get_current_user_handle():
+    client = get_client()
+    return client.me.handle
+
 def get_profile(handle=None):
     client = get_client()
     actor = handle if handle else client.me.did
@@ -44,3 +48,8 @@ def update_profile(display_name=None, description=None):
         record=record
     )
     client.com.atproto.repo.put_record(data=data_put)
+
+def create_post(text):
+    client = get_client()
+    response = client.send_post(text=text)
+    return response

@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-from atproto_service import get_profile, update_profile, get_posts
+from atproto_service import get_profile, update_profile, get_posts, get_current_user_handle, create_post
 
 app = Flask(__name__)
 
@@ -68,7 +68,10 @@ def profile(handle=None):
             post.reply_author = None
             if post.reply and post.reply.parent and hasattr(post.reply.parent, 'author'):
                 post.reply_author = post.reply.parent.author.display_name or post.reply.parent.author.handle
-        return render_template('profile.html', profile=profile, posts=posts)
+        # Determine if this is the authenticated user's profile
+        current_user_handle = get_current_user_handle()
+        is_own_profile = profile.handle.lower() == current_user_handle.lower()
+        return render_template('profile.html', profile=profile, posts=posts, is_own_profile=is_own_profile)
     except Exception as e:
         return f"Error: {str(e)}"
 
@@ -96,6 +99,17 @@ def update_profile_route():
     else:
         # If GET, redirect back to profile
         return redirect(url_for('profile'))
+
+@app.route('/new_post', methods=['POST'])
+def new_post():
+    try:
+        text = request.form.get('text', '').strip()
+        if not text:
+            return "Post text cannot be empty", 400
+        create_post(text)
+        return redirect(url_for('profile'))
+    except Exception as e:
+        return f"Error creating post: {str(e)}"
 
 if __name__ == '__main__':
     app.run(debug=True)

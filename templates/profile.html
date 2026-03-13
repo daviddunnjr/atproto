@@ -21,6 +21,14 @@
         <p class="did">{{ profile.did }}</p>
         </div>
     </div>
+    {% if is_own_profile %}
+    <div class="new-post">
+        <form method="POST" action="/new_post">
+            <textarea name="text" placeholder="What's on your mind?" required></textarea>
+            <button type="submit">Post</button>
+        </form>
+    </div>
+    {% endif %}
     <div class="posts">
         {% for post in posts %}
         {% include 'post_item.html' %}
