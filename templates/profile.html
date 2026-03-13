@@ -23,11 +23,33 @@
     </div>
     {% if is_own_profile %}
     <div class="new-post">
-        <form method="POST" action="/new_post">
-            <textarea name="text" placeholder="What's on your mind?" required></textarea>
-            <button type="submit">Post</button>
+        <form method="POST" action="/new_post" id="postForm">
+            <textarea name="text" id="postTextarea" placeholder="What's on your mind?" required></textarea>
+            <div class="post-controls">
+                <span class="char-count"><span id="charCount">0</span>/300</span>
+                <button type="submit" id="postButton">Post</button>
+            </div>
         </form>
     </div>
+    <script>
+        const textarea = document.getElementById('postTextarea');
+        const charCount = document.getElementById('charCount');
+        const postButton = document.getElementById('postButton');
+        const MAX_CHARS = 300;
+
+        textarea.addEventListener('input', function() {
+            const length = this.value.length;
+            charCount.textContent = length;
+            
+            if (length > MAX_CHARS) {
+                postButton.disabled = true;
+                charCount.parentElement.classList.add('over-limit');
+            } else {
+                postButton.disabled = false;
+                charCount.parentElement.classList.remove('over-limit');
+            }
+        });
+    </script>
     {% endif %}
     <div class="posts">
         {% for post in posts %}

@@ -6,6 +6,29 @@ def get_client():
     client.login(Login().Username(), Login().Password())
     return client
 
+def blob_to_url(blob, did=None):
+    """Convert a blob object to a CDN URL or blob fetch URL."""
+    if not blob:
+        return None
+    
+    # If it's already a string, return it
+    if isinstance(blob, str):
+        return blob
+    
+    # Try to get the CID from the blob object
+    cid = None
+    if hasattr(blob, 'ref'):
+        ref = blob.ref
+        if hasattr(ref, 'link'):
+            cid = ref.link
+    
+    if cid:
+        # Use the CDN URL for blobs
+        return f"https://cdn.bsky.app/img/feed_fullsize/{cid}"
+    
+    # Fallback - return the string representation
+    return str(blob)
+
 def get_current_user_handle():
     client = get_client()
     return client.me.handle

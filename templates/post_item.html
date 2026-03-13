@@ -9,7 +9,7 @@
         {% if post.has_images %}
         <div class="images">
             {% for image in post.post.record.embed.images %}
-            <img src="{{ image.thumb }}" alt="{{ image.alt }}" style="max-width: 200px;">
+            <img src="{{ image.image }}" alt="{{ image.alt or 'Image' }}" />
             {% endfor %}
         </div>
         {% elif post.has_external %}
@@ -20,14 +20,16 @@
         {% endif %}
     </div>
     {% endif %}
-    {% if post.has_quote and post.quoted_post %}
-    <div class="quote">
-        <div class="quoted-post">
-            <p><strong>{{ post.quoted_post.author }}</strong></p>
-            <p>{{ post.quoted_post.text }}</p>
-            <p class="timestamp">{{ post.quoted_post.created_at }}</p>
+    {% if post.post.record %}
+        <div class="quote">
+            <div class="quoted-post">
+                {% for record in post.post.record %}
+                    <p><strong>{{ record.author }}</strong></p>
+                    <p>{{ record.text }}</p>
+                    <p class="timestamp">{{ record.created_at }}</p>
+                {% endfor %}
+            </div>
         </div>
-    </div>
     {% endif %}
     <div class="stats">
         <span>Replies: {{ post.post.reply_count or 0 }}</span>

@@ -24,35 +24,39 @@ def profile(handle=None):
                     post.has_images = True
                 if hasattr(post.post.record.embed, 'external'):
                     post.has_external = True
-                if hasattr(post.post.record.embed, 'record'):
+                if hasattr(post.post.record.embed, 'quote'):
                     post.has_quote = True
                     # Extract quoted post information
                     try:
-                        quoted = post.post.record.embed.record
+                        quote_obj = post.post.record.embed.quote
                         quoted_author = 'Unknown'
                         quoted_text = ''
                         quoted_created = ''
                         
-                        # Try to get author - could be at different levels
-                        if hasattr(quoted, 'author') and quoted.author:
-                            author_obj = quoted.author
-                            if hasattr(author_obj, 'display_name'):
-                                quoted_author = author_obj.display_name or author_obj.handle
+                        # The quote object contains the referenced post
+                        # Try to get author from various levels
+                        if hasattr(quote_obj, 'author') and quote_obj.author:
+                            author_obj = quote_obj.author
+                            if hasattr(author_obj, 'display_name') and author_obj.display_name:
+                                quoted_author = author_obj.display_name
                             elif hasattr(author_obj, 'handle'):
                                 quoted_author = author_obj.handle
                         
-                        # Try to get text from value first, then directly
-                        if hasattr(quoted, 'value'):
-                            if hasattr(quoted.value, 'text'):
-                                quoted_text = quoted.value.text
-                            if hasattr(quoted.value, 'created_at'):
-                                quoted_created = quoted.value.created_at
-                        elif hasattr(quoted, 'text'):
-                            quoted_text = quoted.text
-                        elif hasattr(quoted, 'record') and hasattr(quoted.record, 'text'):
-                            quoted_text = quoted.record.text
-                            if hasattr(quoted.record, 'created_at'):
-                                quoted_created = quoted.record.created_at
+                        # Try to get text from value/record
+                        if hasattr(quote_obj, 'value') and quote_obj.value:
+                            if hasattr(quote_obj.value, 'text'):
+                                quoted_text = quote_obj.value.text
+                            if hasattr(quote_obj.value, 'created_at'):
+                                quoted_created = quote_obj.value.created_at
+                        elif hasattr(quote_obj, 'record') and quote_obj.record:
+                            if hasattr(quote_obj.record, 'text'):
+                                quoted_text = quote_obj.record.text
+                            if hasattr(quote_obj.record, 'created_at'):
+                                quoted_created = quote_obj.record.created_at
+                        elif hasattr(quote_obj, 'text'):
+                            quoted_text = quote_obj.text
+                            if hasattr(quote_obj, 'created_at'):
+                                quoted_created = quote_obj.created_at
                         
                         post.quoted_post = {
                             'author': quoted_author,
@@ -60,7 +64,10 @@ def profile(handle=None):
                             'created_at': quoted_created
                         }
                     except Exception as e:
-                        pass
+                        print(f"Error extracting quote post: {e}")
+                        print(f"Quote embed object: {post.post.record.embed.quote}")
+                        import traceback
+                        traceback.print_exc()
             # Add context flags
             post.repost_author = None
             if post.reason and hasattr(post.reason, 'repost') and post.reason.repost and post.reason.by:
